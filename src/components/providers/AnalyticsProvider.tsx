@@ -12,7 +12,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   return (
     <>
       {children}
-      {process.env.NODE_ENV === 'production' && (
+      {(process.env.NODE_ENV || 'production') === 'production' && (
         <>
           <Analytics />
           <SpeedInsights />
