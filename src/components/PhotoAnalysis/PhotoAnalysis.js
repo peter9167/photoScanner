@@ -2,9 +2,8 @@ import React, { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './PhotoAnalysis.css';
 
-// WARNING: DO NOT EXPOSE YOUR API KEY PUBLICLY.
-// This is for local testing ONLY. Remove or secure via a backend for production.
-const GEMINI_API_KEY = 'AIzaSyDkx4L2FvHs8Xqd_YSuhVCPhU0rx37PHZM';
+// API 키는 환경변수에서 가져옵니다
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
 // Helper function to convert file to base64
@@ -41,6 +40,11 @@ function PhotoAnalysis() {
 
   const handleAnalysis = useCallback(async () => {
     if (!selectedFile) return;
+
+    if (!GEMINI_API_KEY) {
+      setError('API 키가 설정되지 않았습니다. 관리자에게 문의하세요.');
+      return;
+    }
 
     setIsLoading(true);
     setAnalysisResult(null);
