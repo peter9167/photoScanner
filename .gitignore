@@ -1,69 +1,109 @@
-# Dependencies
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Production build
-/build
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Runtime data
+# testing
+/coverage
+*.lcov
+
+# next.js
+/.next/
+/out/
+.next
+.vercel
+
+# production
+/build
+/dist
+
+# runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# OS generated files
+# misc
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+*.tsbuildinfo
+.cache
+.turbo
 
-# IDE files
+# environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.sublime-workspace
+.sublime-project
 
-# Optional npm cache directory
-.npm
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 
-# Coverage directory used by tools like istanbul
-coverage/
+# Logs
+logs
+*.log
 
-# Dependency directories
-node_modules/
-jspm_packages/
+# Temporary files
+*.tmp
+*.temp
+/tmp/
 
-# Optional REPL history
-.node_repl_history
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
-# Output of 'npm pack'
-*.tgz
+# Sentry
+.sentryclirc
 
-# Yarn Integrity file
-.yarn-integrity
+# Bundle analyzer
+.next-bundle-analyzer/
 
-# ESLint cache
-.eslintcache
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
 
-# Parcel cache
-.cache
-.parcel-cache
+# Local SSL certificates
+*.pem
 
-# Temporary folders
-tmp/
-temp/
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local Netlify folder
+.netlify
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
