@@ -227,7 +227,7 @@ const MediaFilters: React.FC<MediaFiltersProps> = ({
           )}
           {searchQuery && (
             <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-              Search: "{searchQuery}"
+              Search: &quot;{searchQuery}&quot;
             </span>
           )}
           <button

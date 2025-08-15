@@ -61,7 +61,7 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({
             Welcome back! 👋
           </h1>
           <p className="text-text-secondary">
-            Here's what's happening with your photo memories today.
+            Here&apos;s what&apos;s happening with your photo memories today.
           </p>
         </div>
 
