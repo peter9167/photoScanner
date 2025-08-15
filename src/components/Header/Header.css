@@ -1,0 +1,19 @@
+.app-header {
+  background-color: #2c3e50;
+  padding: 20px 0;
+  color: white;
+  text-align: center;
+  border-bottom: 4px solid #f39c12;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  color: white;
+}
+
+.app-header .logo-subtitle {
+  font-size: 1em;
+  color: #ecf0f1;
+  margin-top: 5px;
+} 
