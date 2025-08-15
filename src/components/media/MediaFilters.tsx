@@ -95,7 +95,7 @@ const MediaFilters: React.FC<MediaFiltersProps> = ({
     { key: 'download', label: 'Download', icon: Download },
     { key: 'tag', label: 'Add Tags', icon: Tag },
     { key: 'move', label: 'Move to Folder', icon: FolderOpen },
-    { key: 'delete', label: 'Delete', icon: Trash2, variant: 'destructive' as const }
+    { key: 'delete', label: 'Delete', icon: Trash2, variant: 'danger' as const }
   ];
 
   return (

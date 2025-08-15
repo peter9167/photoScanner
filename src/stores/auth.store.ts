@@ -162,15 +162,16 @@ export const useAuthStore = create<AuthState>()(
               return;
             }
 
+            const userData = data as any;
             set({
               profile: {
-                id: data.id,
-                email: data.email,
-                displayName: data.display_name,
-                avatarUrl: data.avatar_url,
-                language: data.language,
-                subscriptionPlan: data.subscription_plan,
-                totalStorageBytes: data.total_storage_bytes,
+                id: userData?.id,
+                email: userData?.email,
+                displayName: userData?.display_name,
+                avatarUrl: userData?.avatar_url,
+                language: userData?.language,
+                subscriptionPlan: userData?.subscription_plan,
+                totalStorageBytes: userData?.total_storage_bytes,
               },
             });
           } catch (error) {

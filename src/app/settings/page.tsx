@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import SettingsForm from '@/components/settings/SettingsForm';
 import { UserSettings } from '@/types/settings.types';
+import { cn } from '@/lib/utils';
 
 // Mock user settings
 const mockSettings: UserSettings = {

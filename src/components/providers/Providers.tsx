@@ -54,7 +54,6 @@ export function Providers({ children }: ProvidersProps) {
               <ReactQueryDevtools 
                 initialIsOpen={false} 
                 position="bottom-right"
-                buttonPosition="bottom-right"
               />
             </AnalyticsProvider>
           </AuthProvider>

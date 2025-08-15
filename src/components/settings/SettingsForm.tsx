@@ -1,6 +1,12 @@
 import React from 'react';
 
-export default function SettingsForm() {
+interface SettingsFormProps {
+  settings: any;
+  activeSection: string;
+  onUpdate: (newSettings: any) => void;
+}
+
+export default function SettingsForm({ settings, activeSection, onUpdate }: SettingsFormProps) {
   return (
     <div className="bg-card p-6 rounded-lg border">
       <h3 className="text-lg font-semibold mb-4">Settings</h3>

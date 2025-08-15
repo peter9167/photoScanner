@@ -142,7 +142,7 @@ export default function ProjectsPage() {
     if (query.trim()) {
       filtered = filtered.filter(project => 
         project.title.toLowerCase().includes(query.toLowerCase()) ||
-        project.description.toLowerCase().includes(query.toLowerCase())
+        (project.description && project.description.toLowerCase().includes(query.toLowerCase()))
       );
     }
 

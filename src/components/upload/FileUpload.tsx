@@ -64,7 +64,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         id: generateId(),
         status: error ? 'error' : 'success',
         progress: error ? 0 : 100,
-        error
+        error: error || undefined
       };
       
       // Create preview for images

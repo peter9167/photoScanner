@@ -120,12 +120,22 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 
 CardFooter.displayName = 'CardFooter';
 
-// Attach sub-components to main Card component
-Card.Header = CardHeader;
-Card.Title = CardTitle;
-Card.Description = CardDescription;
-Card.Content = CardContent;
-Card.Footer = CardFooter;
+// Create compound component with proper typing
+interface CardWithComponents extends React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLDivElement>> {
+  Header: typeof CardHeader;
+  Title: typeof CardTitle;
+  Description: typeof CardDescription;
+  Content: typeof CardContent;
+  Footer: typeof CardFooter;
+}
 
-export default Card;
+// Attach sub-components to main Card component
+const CardWithSubComponents = Card as CardWithComponents;
+CardWithSubComponents.Header = CardHeader;
+CardWithSubComponents.Title = CardTitle;
+CardWithSubComponents.Description = CardDescription;
+CardWithSubComponents.Content = CardContent;
+CardWithSubComponents.Footer = CardFooter;
+
+export default CardWithSubComponents;
 export { CardHeader, CardTitle, CardDescription, CardContent, CardFooter };

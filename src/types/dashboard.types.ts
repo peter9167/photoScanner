@@ -19,7 +19,7 @@ export interface Project {
   thumbnailUrl?: string;
   photoCount: number;
   duration: number; // in seconds
-  style: 'classic' | 'modern' | 'cinematic' | 'vintage' | 'professional';
+  style: string;
   progress?: number; // 0-100 for processing projects
   eta?: string; // estimated time remaining
   createdAt: Date;

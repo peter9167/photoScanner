@@ -34,7 +34,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
     }
   }, [type, showPassword]);
 
-  const inputId = React.useMemo(() => id || `input-${React.useId()}`, [id]);
+  const hookId = React.useId();
+  const inputId = id || `input-${hookId}`;
 
   const inputClasses = cn(
     // Base styles

@@ -6,6 +6,7 @@ import QueueList from '@/components/queue/QueueList';
 import QueueStats from '@/components/queue/QueueStats';
 import QueueControls from '@/components/queue/QueueControls';
 import { QueueItem, QueueStats as QueueStatsType } from '@/types/queue.types';
+import { cn } from '@/lib/utils';
 
 // Mock data for queue items
 const mockQueueItems: QueueItem[] = [
