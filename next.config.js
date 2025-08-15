@@ -1,10 +1,6 @@
 /** @type {import('next').NextConfig} */
-const { withSentryConfig } = require('@sentry/nextjs');
 
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   
   images: {
     domains: [
@@ -95,13 +91,6 @@ const nextConfig = {
   },
 };
 
-// Sentry configuration
-const sentryWebpackPluginOptions = {
-  silent: true,
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-};
-
 // Bundle analyzer
 if (process.env.ANALYZE === 'true') {
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -109,7 +98,5 @@ if (process.env.ANALYZE === 'true') {
   });
   module.exports = withBundleAnalyzer(nextConfig);
 } else {
-  module.exports = process.env.NODE_ENV === 'production' 
-    ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
-    : nextConfig;
+  module.exports = nextConfig;
 }
