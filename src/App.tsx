@@ -1,14 +1,29 @@
 import React, { useState, useRef } from 'react';
 import './App.css';
 
+interface UploadedImage {
+  id: number;
+  file: File;
+  url: string;
+  name: string;
+}
+
+interface VideoStyle {
+  id: number;
+  name: string;
+  description: string;
+  preview: string;
+  color: string;
+}
+
 function App() {
-  const [selectedFeature, setSelectedFeature] = useState('photo-to-video');
-  const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'photo-to-video'
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [selectedVideoStyle, setSelectedVideoStyle] = useState(null);
-  const [selectedDuration, setSelectedDuration] = useState('1min');
-  const [videoPrompt, setVideoPrompt] = useState('');
-  const fileInputRef = useRef(null);
+  const [selectedFeature, setSelectedFeature] = useState<string>('photo-to-video');
+  const [currentPage, setCurrentPage] = useState<string>('home'); // 'home' or 'photo-to-video'
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [selectedVideoStyle, setSelectedVideoStyle] = useState<number | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<string>('1min');
+  const [videoPrompt, setVideoPrompt] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 샘플 갤러리 데이터
   const sampleGallery = [
@@ -51,7 +66,7 @@ function App() {
   ];
 
   // 영상 스타일 데이터
-  const videoStyles = [
+  const videoStyles: VideoStyle[] = [
     {
       id: 1,
       name: "클래식",
@@ -93,17 +108,17 @@ function App() {
   ];
 
   // 이미지 업로드 처리
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
     
     files.forEach(file => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = (e: ProgressEvent<FileReader>) => {
           const newImage = {
             id: Date.now() + Math.random(),
             file: file,
-            url: e.target.result,
+            url: e.target?.result as string,
             name: file.name
           };
           setUploadedImages(prev => [...prev, newImage]);
@@ -114,23 +129,37 @@ function App() {
   };
 
   // 이미지 삭제
-  const removeImage = (imageId) => {
+  const removeImage = (imageId: number) => {
     setUploadedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   // 드래그 앤 드롭 처리
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     
     if (imageFiles.length > 0) {
-      const event = { target: { files: imageFiles } };
-      handleImageUpload(event);
+      // Process files directly instead of creating a mock event
+      imageFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e: ProgressEvent<FileReader>) => {
+            const newImage: UploadedImage = {
+              id: Date.now() + Math.random(),
+              file: file,
+              url: e.target?.result as string,
+              name: file.name
+            };
+            setUploadedImages(prev => [...prev, newImage]);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
   };
 
