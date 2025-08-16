@@ -83,23 +83,38 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     }
   ];
 
+  const handleNewProject = () => {
+    // Navigate to projects page or trigger new project modal
+    window.location.href = '/projects';
+  };
+
+  const handleUploadMedia = () => {
+    // Navigate to media library page
+    window.location.href = '/media';
+  };
+
+  const handleGenerateVideo = () => {
+    // Navigate to main page where video generation happens
+    window.location.href = '/';
+  };
+
   const quickActions = [
     {
       label: "New Project",
       icon: <Plus className="h-4 w-4" />,
-      onClick: () => console.log('New project'),
+      onClick: handleNewProject,
       variant: 'primary' as const
     },
     {
       label: "Upload Media",
       icon: <Upload className="h-4 w-4" />,
-      onClick: () => console.log('Upload media'),
+      onClick: handleUploadMedia,
       variant: 'secondary' as const
     },
     {
       label: "Generate Video",
       icon: <Zap className="h-4 w-4" />,
-      onClick: () => console.log('Generate video'),
+      onClick: handleGenerateVideo,
       variant: 'outline' as const
     }
   ];

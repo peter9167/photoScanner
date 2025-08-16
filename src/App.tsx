@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './App.css';
 
 function App() {
   const [selectedFeature, setSelectedFeature] = useState('photo-to-video');
   const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'photo-to-video'
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [selectedVideoStyle, setSelectedVideoStyle] = useState(null);
+  const [selectedDuration, setSelectedDuration] = useState('1min');
+  const [videoPrompt, setVideoPrompt] = useState('');
+  const fileInputRef = useRef(null);
 
   // 샘플 갤러리 데이터
   const sampleGallery = [
@@ -79,13 +84,81 @@ function App() {
 
   // 영상 시간 옵션
   const videoDurations = [
-    { id: 1, label: "1min", value: "1min", selected: true },
+    { id: 1, label: "1min", value: "1min" },
     { id: 2, label: "3min", value: "3min" },
     { id: 3, label: "5min", value: "5min" },
     { id: 4, label: "5~10min", value: "5-10min" },
     { id: 5, label: "10~20min", value: "10-20min" },
     { id: 6, label: "20~30min", value: "20-30min" }
   ];
+
+  // 이미지 업로드 처리
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const newImage = {
+            id: Date.now() + Math.random(),
+            file: file,
+            url: e.target.result,
+            name: file.name
+          };
+          setUploadedImages(prev => [...prev, newImage]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  // 이미지 삭제
+  const removeImage = (imageId) => {
+    setUploadedImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  // 드래그 앤 드롭 처리
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length > 0) {
+      const event = { target: { files: imageFiles } };
+      handleImageUpload(event);
+    }
+  };
+
+  // 파일 선택 트리거
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 영상 생성 가능 여부 확인
+  const canGenerateVideo = uploadedImages.length > 0;
+
+  // 영상 생성 처리
+  const handleGenerateVideo = () => {
+    if (!canGenerateVideo) {
+      alert('먼저 사진을 업로드해주세요.');
+      return;
+    }
+    
+    const generationData = {
+      images: uploadedImages,
+      prompt: videoPrompt,
+      style: selectedVideoStyle,
+      duration: selectedDuration
+    };
+    
+    console.log('영상 생성 데이터:', generationData);
+    alert(`영상 생성을 시작합니다!\n\n사진: ${uploadedImages.length}장\n스타일: ${videoStyles.find(s => s.id === selectedVideoStyle)?.name || '선택 안함'}\n길이: ${selectedDuration}\n프롬프트 길이: ${videoPrompt.length}자`);
+  };
 
   const renderPhotoToVideoPage = () => (
     <div className="flex-1 flex flex-col">
@@ -110,7 +183,15 @@ function App() {
             <button className="px-4 py-2 bg-card-hover hover:bg-gray-600 text-text-primary rounded-lg transition-colors">
               저장하기
             </button>
-            <button className="px-6 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg font-medium transition-colors">
+            <button 
+              onClick={handleGenerateVideo}
+              disabled={!canGenerateVideo}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                canGenerateVideo 
+                  ? 'bg-primary hover:bg-primary-hover text-white' 
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               영상 생성
             </button>
           </div>
@@ -131,8 +212,21 @@ function App() {
              <div className="space-y-6">
                {/* Upload Area */}
                <div className="relative group">
+                 <input
+                   ref={fileInputRef}
+                   type="file"
+                   multiple
+                   accept="image/*"
+                   onChange={handleImageUpload}
+                   className="hidden"
+                 />
                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                 <div className="relative bg-gradient-to-br from-card-bg via-card-bg to-card-hover rounded-2xl p-6 border border-gray-600/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group-hover:shadow-2xl">
+                 <div 
+                   className="relative bg-gradient-to-br from-card-bg via-card-bg to-card-hover rounded-2xl p-6 border border-gray-600/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group-hover:shadow-2xl"
+                   onDragOver={handleDragOver}
+                   onDrop={handleDrop}
+                   onClick={triggerFileSelect}
+                 >
                    
                    {/* Floating Icons Animation */}
                    <div className="absolute top-3 left-4 w-3 h-3 bg-primary/20 rounded-full animate-pulse"></div>
@@ -190,36 +284,49 @@ function App() {
                </div>
 
                {/* Photo Preview with Enhanced Design */}
-               <div className="flex justify-center">
-                 <div className="relative group">
-                   <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-purple-500/30 rounded-xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
-                   <div className="relative w-48 h-48 rounded-xl overflow-hidden cursor-pointer transform group-hover:scale-105 transition-all duration-300">
-                     <img 
-                       src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=200&h=200&fit=crop"
-                       alt="업로드된 사진"
-                       className="w-full h-full object-cover"
-                     />
-                     
-                     {/* Overlay */}
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                     
-                     {/* Delete Button */}
-                     <button className="absolute top-2 right-2 w-7 h-7 bg-red-500/90 hover:bg-red-500 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110">
-                       <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                       </svg>
-                     </button>
-                     
-                     {/* Success Badge */}
-                     <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500/90 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center">
-                       <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                       </svg>
-                       완료
-                     </div>
+               {uploadedImages.length > 0 && (
+                 <div className="space-y-4">
+                   <h3 className="text-lg font-semibold text-text-primary">업로드된 사진 ({uploadedImages.length}장)</h3>
+                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                     {uploadedImages.map((image) => (
+                       <div key={image.id} className="relative group">
+                         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-purple-500/30 rounded-xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                         <div className="relative w-full aspect-square rounded-xl overflow-hidden cursor-pointer transform group-hover:scale-105 transition-all duration-300">
+                           <img 
+                             src={image.url}
+                             alt={image.name}
+                             className="w-full h-full object-cover"
+                           />
+                           
+                           {/* Overlay */}
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                           
+                           {/* Delete Button */}
+                           <button 
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               removeImage(image.id);
+                             }}
+                             className="absolute top-2 right-2 w-7 h-7 bg-red-500/90 hover:bg-red-500 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110"
+                           >
+                             <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                             </svg>
+                           </button>
+                           
+                           {/* Success Badge */}
+                           <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500/90 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center">
+                             <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                             </svg>
+                             완료
+                           </div>
+                         </div>
+                       </div>
+                     ))}
                    </div>
                  </div>
-               </div>
+               )}
              </div>
 
              {/* Right Side - Video Description */}
@@ -239,6 +346,8 @@ function App() {
                    
                    <div className="flex-1 flex flex-col">
                      <textarea 
+                       value={videoPrompt}
+                       onChange={(e) => setVideoPrompt(e.target.value)}
                        placeholder="당신의 특별한 순간을 어떤 이야기로 만들고 싶으신가요?&#13;&#10;🎂 할아버지 칠순잔치 예시:&#10;&quot;평생 농사를 지으며 가족을 키워내신 할아버지의 칠순을 맞아, 온 가족이 모였습니다. 할아버지께서 손수 쓰신 초대장처럼 따뜻하고 정성스러운 영상을 만들어주세요. 젊은 시절 흑백사진부터 지금까지의 추억들이 담긴 감동적인 이야기로...&quot;&#13;&#10;👶 돌잔치 예시:&#10;&quot;우리 아이의 첫 번째 생일, 온 가족의 사랑을 받으며 자라온 소중한 365일의 기록입니다. 아이의 첫 미소, 첫 걸음마까지 모든 순간이 기적같았어요. 밝고 사랑스러운 분위기로 아이의 성장 스토리를 담아주세요.&quot;&#13;&#10;✈️ 가족여행 예시:&#10;&quot;3년 만에 온 가족이 함께한 제주도 여행. 코로나로 힘들었던 시간을 뒤로하고 다시 웃을 수 있었던 소중한 시간이었습니다. 바다와 함께한 자유로운 순간들, 아이들의 환한 웃음소리가 들리는 듯한 영상으로 만들어주세요.&quot;"
                        className="flex-1 w-full bg-card-hover/50 border border-gray-600/50 rounded-lg px-4 py-3 text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary/50 focus:bg-card-hover/70 transition-all resize-none text-sm leading-relaxed min-h-[200px]"
                      />
@@ -252,7 +361,7 @@ function App() {
                            AI가 더 정확한 영상을 만들 수 있어요
                          </span>
                        </div>
-                       <span className="text-xs text-text-secondary">0/500자</span>
+                       <span className="text-xs text-text-secondary">{videoPrompt.length}/500자</span>
                      </div>
                    </div>
                  </div>
@@ -270,7 +379,15 @@ function App() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {videoStyles.map((style) => (
-              <div key={style.id} className="relative rounded-lg overflow-hidden cursor-pointer group border-2 border-transparent hover:border-primary transition-colors">
+              <div 
+                key={style.id} 
+                onClick={() => setSelectedVideoStyle(style.id)}
+                className={`relative rounded-lg overflow-hidden cursor-pointer group border-2 transition-colors ${
+                  selectedVideoStyle === style.id 
+                    ? 'border-primary ring-2 ring-primary/30' 
+                    : 'border-transparent hover:border-primary'
+                }`}
+              >
                 <div 
                   className="aspect-video bg-cover bg-center"
                   style={{ backgroundImage: `url(${style.preview})` }}
@@ -304,8 +421,9 @@ function App() {
              {videoDurations.map((duration) => (
                <button
                  key={duration.id}
+                 onClick={() => setSelectedDuration(duration.value)}
                  className={`px-6 py-3 rounded-lg border transition-all font-medium ${
-                   duration.selected
+                   selectedDuration === duration.value
                      ? 'bg-yellow-500 text-dark-bg border-yellow-500'
                      : 'bg-transparent text-text-primary border-gray-600 hover:border-yellow-500/50 hover:bg-yellow-500/10'
                  }`}
@@ -318,11 +436,24 @@ function App() {
 
         {/* Generation Button */}
         <div className="text-center">
-          <button className="px-12 py-4 bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-orange-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+          <button 
+            onClick={handleGenerateVideo}
+            disabled={!canGenerateVideo}
+            className={`px-12 py-4 rounded-xl font-bold text-lg transition-all transform shadow-lg ${
+              canGenerateVideo 
+                ? 'bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-orange-500 text-white hover:scale-105' 
+                : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+            }`}
+          >
             <span className="mr-3">✨</span>
             AI 영상 생성하기
           </button>
-          <p className="text-text-secondary text-sm mt-2">예상 생성 시간: 2-3분</p>
+          <p className="text-text-secondary text-sm mt-2">
+            {canGenerateVideo 
+              ? '예상 생성 시간: 2-3분' 
+              : '사진을 업로드하면 영상을 생성할 수 있습니다'
+            }
+          </p>
         </div>
       </div>
     </div>

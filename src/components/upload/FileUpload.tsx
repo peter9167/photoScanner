@@ -6,12 +6,14 @@ import { UploadProgress } from '@/types/dashboard.types';
 
 export interface FileUploadProps {
   onFilesChange: (files: File[]) => void;
+  onPromptChange?: (prompt: string) => void;
   accept?: string;
   multiple?: boolean;
   maxSize?: number; // in bytes
   maxFiles?: number;
   disabled?: boolean;
   preview?: boolean;
+  showPromptInput?: boolean;
   className?: string;
 }
 
@@ -26,17 +28,20 @@ interface UploadedFile {
 
 const FileUpload: React.FC<FileUploadProps> = ({
   onFilesChange,
+  onPromptChange,
   accept = 'image/*',
   multiple = true,
   maxSize = 10 * 1024 * 1024, // 10MB
   maxFiles = 20,
   disabled = false,
   preview = true,
+  showPromptInput = true,
   className
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [prompt, setPrompt] = useState('');
 
   const validateFile = useCallback((file: File): string | null => {
     if (file.size > maxSize) {
@@ -149,6 +154,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
       openFileDialog();
     }
   }, [disabled, openFileDialog]);
+
+  const handlePromptChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newPrompt = e.target.value;
+    setPrompt(newPrompt);
+    onPromptChange?.(newPrompt);
+  }, [onPromptChange]);
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -281,11 +292,44 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
       )}
       
+      {/* Video Description Input */}
+      {showPromptInput && files.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold text-text-primary">Video Description</h4>
+          <div className="relative">
+            <textarea
+              value={prompt}
+              onChange={handlePromptChange}
+              placeholder="Describe your video... 
+              
+🎂 Example for birthday party:
+&quot;This is Emma's 5th birthday celebration with family and friends. We want a joyful, bright video that captures the excitement and happiness of this special day. Please include smooth transitions between photos showing the cake, decorations, and all the smiling faces.&quot;
+
+✈️ Example for vacation:
+&quot;Our family trip to Hawaii - 7 days of beautiful beaches, amazing sunsets, and quality time together. Create a relaxing, cinematic video that tells the story of our adventure with peaceful music and scenic transitions.&quot;
+
+🎓 Example for graduation:
+&quot;Sarah's college graduation day - 4 years of hard work paying off. We want an inspiring, uplifting video that shows her journey and this proud moment. Please emphasize the achievement and celebration with elegant transitions.&quot;"
+              className="w-full h-32 p-4 bg-card-bg border border-gray-600 rounded-lg text-text-primary placeholder-text-secondary resize-none focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              maxLength={500}
+            />
+            <div className="absolute bottom-2 right-2 text-xs text-text-secondary">
+              {prompt.length}/500
+            </div>
+          </div>
+          <div className="flex items-center text-sm text-text-secondary">
+            <AlertCircle className="w-4 h-4 mr-2" />
+            <span>Adding a description helps AI create a better video that matches your vision</span>
+          </div>
+        </div>
+      )}
+      
       {/* Upload Summary */}
       {files.length > 0 && (
         <div className="flex items-center justify-between p-4 bg-card-bg rounded-lg border border-gray-700">
           <div className="text-sm text-text-secondary">
             {files.filter(f => f.status === 'success').length} of {files.length} files ready
+            {prompt && <span className="ml-2">• Description added</span>}
           </div>
           
           <div className="flex space-x-2">
@@ -302,6 +346,20 @@ const FileUpload: React.FC<FileUploadProps> = ({
               variant="primary"
               size="sm"
               disabled={files.filter(f => f.status === 'success').length === 0}
+              onClick={() => {
+                const validFiles = files.filter(f => f.status === 'success');
+                const projectData = {
+                  files: validFiles.map(f => f.file),
+                  prompt: prompt.trim(),
+                  fileCount: validFiles.length
+                };
+                
+                console.log('Starting video generation with:', projectData);
+                alert(`🎬 Starting video generation!\n\nFiles: ${projectData.fileCount}\nDescription: ${projectData.prompt ? 'Added' : 'None'}\n\nThis will redirect to the generation queue.`);
+                
+                // In a real app, this would create a new project and redirect
+                window.location.href = '/queue';
+              }}
             >
               Continue to Generation
             </Button>

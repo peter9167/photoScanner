@@ -32,6 +32,10 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({
     console.log('Files selected:', files);
   };
 
+  const handlePromptChange = (prompt: string) => {
+    console.log('Prompt changed:', prompt);
+  };
+
   const handleProjectPlay = (projectId: string) => {
     console.log('Play project:', projectId);
   };
@@ -114,10 +118,12 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({
               </h2>
               <FileUpload
                 onFilesChange={handleFilesChange}
+                onPromptChange={handlePromptChange}
                 accept="image/*"
                 multiple={true}
                 maxFiles={20}
                 maxSize={10 * 1024 * 1024} // 10MB
+                showPromptInput={true}
               />
             </section>
 
