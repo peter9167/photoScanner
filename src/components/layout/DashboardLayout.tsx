@@ -38,9 +38,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const navigationLinks: NavigationLink[] = [
     {
       label: "Dashboard",
-      href: "/dashboard",
+      href: "/",
       icon: <Home className="h-5 w-5" />,
-      isActive: currentPath === '/dashboard'
+      isActive: currentPath === '/' || currentPath === '/dashboard'
     },
     {
       label: "Projects",
@@ -142,15 +142,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {/* Navigation */}
             <nav className="flex-1 space-y-1 p-4" role="list">
               {navigationLinks.map((link) => (
-                <button
+                <a
                   key={link.href}
+                  href={link.href}
                   onClick={() => {
-                    console.log(`Navigate to ${link.href}`);
-                    // For now, just prevent navigation since we only have dashboard page
-                    if (link.href !== '/dashboard') {
-                      alert(`${link.label} page is not implemented yet. This is a demo dashboard.`);
-                      return;
-                    }
+                    setSidebarOpen(false); // Close mobile sidebar on navigation
                   }}
                   className={cn(
                     "flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 w-full text-left group",
@@ -183,7 +179,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       {link.badge}
                     </span>
                   )}
-                </button>
+                </a>
               ))}
             </nav>
 

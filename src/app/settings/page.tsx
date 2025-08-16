@@ -11,7 +11,7 @@ const mockSettings: UserSettings = {
   profile: {
     name: 'John Doe',
     email: 'john.doe@example.com',
-    avatar: '',
+    avatar: '/images/img (4).jpg',
     timezone: 'America/New_York',
     language: 'en'
   },
